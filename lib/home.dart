@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:simple_template/model/product.dart';
 import 'local_config.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -11,7 +12,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  List products = [];
+  List<Product> products = [];
 
   @override
   void initState() {
@@ -29,10 +30,13 @@ class _HomeScreenState extends State<HomeScreen> {
     );
 
     if (response.statusCode == 200) {
+      final Map<String, dynamic> data = json.decode(response.body);
       setState(() {
-        products = json.decode(response.body);
+        products = (data['products'] as List)
+            .map((product) => Product.fromJson(product))
+            .toList();
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Sucesso: ${response.body}')),
+          SnackBar(content: Text('Sucesso: $products')),
         );
       });
     } else {
